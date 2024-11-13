@@ -8,15 +8,27 @@
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "typegen": "npx pocketbase-typegen --url https://server.track.aidmedium.com --email chiziwokoma@gmail.com --password 'Chical123#' --out ./app/lib/types.ts"
   },
   "dependencies": {
+    "@fontsource-variable/inter-tight": "^5.1.0",
+    "@radix-ui/react-collapsible": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
     "@remix-run/node": "^2.14.0",
     "@remix-run/react": "^2.14.0",
     "@remix-run/serve": "^2.14.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "date-and-time": "^3.6.0",
     "isbot": "^4.1.0",
+    "lucide-react": "^0.456.0",
+    "pocketbase": "^0.21.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.14.0",
