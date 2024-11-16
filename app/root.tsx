@@ -22,7 +22,7 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => [];
 
-export const clientLoader = async ({}: ClientLoaderFunctionArgs) => {
+export const loader = async () => {
   const [workouts, exercises] = await Promise.all([
     api.collection("workouts").getFullList({ sort: "-date" }),
     api.collection("exercises").getFullList(),
@@ -31,9 +31,25 @@ export const clientLoader = async ({}: ClientLoaderFunctionArgs) => {
   return { workouts, exercises };
 };
 
-export function Layout({ children }: { children: React.ReactNode }) {
-  const { state } = useNavigation();
+const CACHE_KEY = "_track_server_cache";
+export const clientLoader = async ({
+  serverLoader,
+}: ClientLoaderFunctionArgs): Promise<Awaited<ReturnType<typeof loader>>> => {
+  const cache = localStorage;
+  const cachedServerData = cache.getItem(CACHE_KEY);
+  if (cachedServerData) {
+    return JSON.parse(cachedServerData);
+  }
 
+  const serverData = await serverLoader();
+  cache.setItem(CACHE_KEY, JSON.stringify(serverData));
+
+  return serverData as Awaited<ReturnType<typeof loader>>;
+};
+
+clientLoader.hydrate = true;
+
+export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -43,11 +59,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {state === "loading" && <div className="loader" />}
         {children}
 
-        <Navbar />
-        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -56,7 +69,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const { state } = useNavigation();
+
+  return (
+    <>
+      {state === "loading" && <div className="loader" />}
+      <Outlet />
+      <Navbar />
+      <Toaster />
+    </>
+  );
 }
 
 export function ErrorBoundary() {
