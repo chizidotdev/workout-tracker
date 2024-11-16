@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export const formatDate = (
   dateObj: Date | string,
-  formatString: string = "MMM DD YYYY, HH:mm",
+  formatString: string = "dddd DD, YYYY",
   utc?: boolean | undefined
 ): string => {
   if (!dateObj) return "-";

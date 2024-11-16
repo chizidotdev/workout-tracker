@@ -74,9 +74,9 @@ export type UsersRecord = {
 	name?: string
 }
 
-export type WorkoutExercisesRecord<Treps = unknown> = {
+export type WorkoutExercisesRecord<Tsets = unknown> = {
 	exercise_id?: RecordIdString
-	reps?: null | Treps
+	sets?: null | Tsets
 	workout_id?: RecordIdString
 }
 
@@ -90,7 +90,7 @@ export type WorkoutsRecord = {
 export type ExercisesResponse<Texpand = unknown> = Required<ExercisesRecord> & BaseSystemFields<Texpand>
 export type ProgressMetricsResponse<Texpand = unknown> = Required<ProgressMetricsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
-export type WorkoutExercisesResponse<Treps = unknown, Texpand = unknown> = Required<WorkoutExercisesRecord<Treps>> & BaseSystemFields<Texpand>
+export type WorkoutExercisesResponse<Tsets = unknown, Texpand = unknown> = Required<WorkoutExercisesRecord<Tsets>> & BaseSystemFields<Texpand>
 export type WorkoutsResponse<Texpand = unknown> = Required<WorkoutsRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
