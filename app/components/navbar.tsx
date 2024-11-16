@@ -6,14 +6,14 @@ import { Paragraph } from "./ui/text";
 
 export function Navbar() {
   return (
-    <div className="footer flex items-center justify-around gap-2">
+    <div className="fixed inset-x-0 bottom-4 z-50 mx-8 flex h-20 items-center justify-around gap-2 rounded-full border bg-background p-4">
       {navLinks.map((link) => (
         <NavLink
           to={link.href}
           className={({ isActive }) =>
             cn(
               "flex items-center gap-2 text-muted-foreground",
-              isActive && "rounded-md border bg-muted px-5 py-2"
+              isActive && "rounded-md border bg-muted px-4 py-2"
             )
           }
         >

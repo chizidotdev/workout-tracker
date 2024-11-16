@@ -49,9 +49,6 @@
   .header {
     @apply fixed inset-x-0 top-0 z-50 mx-auto h-16 max-w-md border-b bg-background p-4;
   }
-  .footer {
-    @apply fixed inset-x-0 bottom-0 z-50 mx-auto h-20 max-w-md border-t bg-background p-4;
-  }
   .loader {
     @apply pointer-events-none fixed inset-0 z-[9999] h-dvh animate-pulse bg-background/60;
   }

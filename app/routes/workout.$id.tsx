@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { ClientLoaderFunctionArgs, Link, Outlet, redirect, useRevalidator } from "@remix-run/react";
-import { formatRelative } from "date-fns";
+import { format, formatRelative } from "date-fns";
 import { ChevronsUpDown, Dumbbell, Loader, Plus, Trash2, Upload } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
 import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
@@ -37,6 +37,8 @@ export const clientLoader = cacheClientLoader;
 export default function WorkoutDetails() {
   const { workout, workoutExercises } = useCachedLoaderData<typeof loader>();
 
+  async function handleAddExercise() {}
+
   return (
     <div className="space-y-6 pt-20">
       <hgroup className="header flex items-center justify-between gap-2">
@@ -46,7 +48,7 @@ export default function WorkoutDetails() {
         </Link>
 
         <Paragraph className="capitalize" variant="label">
-          {formatRelative(new Date(workout.date), new Date())}
+          {format(workout.date, "eeee - MMM dd, yyy")}
         </Paragraph>
       </hgroup>
 
@@ -55,7 +57,10 @@ export default function WorkoutDetails() {
           <WorkoutExercise key={exercise.id} exercise={exercise} />
         ))}
       </div>
-      <Outlet />
+
+      <div className="flex justify-end">
+        <Button onClick={handleAddExercise}>Add exercise</Button>
+      </div>
     </div>
   );
 }
