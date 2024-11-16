@@ -41,7 +41,13 @@
     @apply border-border;
   }
   body {
-    @apply container mx-auto max-w-md bg-background pb-20 text-foreground;
+    @apply bg-background pb-20 text-foreground;
+  }
+  /* body { */
+  /*   @apply container mx-auto max-w-md bg-background pb-20 text-foreground; */
+  /* } */
+  main {
+    @apply container mx-auto max-w-md;
   }
 }
 

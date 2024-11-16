@@ -1,10 +1,11 @@
 import { useState } from "react";
 
-import { ClientLoaderFunctionArgs, Link, Outlet, redirect, useRevalidator } from "@remix-run/react";
-import { format, formatRelative } from "date-fns";
+import { ClientLoaderFunctionArgs, Link, redirect, useRevalidator } from "@remix-run/react";
+import { format } from "date-fns";
 import { ChevronsUpDown, Dumbbell, Loader, Plus, Trash2, Upload } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
 import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
+import { SelectExercise } from "~/components/select-exercise";
 import { Button } from "~/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
 import { Input } from "~/components/ui/input";
@@ -37,8 +38,6 @@ export const clientLoader = cacheClientLoader;
 export default function WorkoutDetails() {
   const { workout, workoutExercises } = useCachedLoaderData<typeof loader>();
 
-  async function handleAddExercise() {}
-
   return (
     <div className="space-y-6 pt-20">
       <hgroup className="header flex items-center justify-between gap-2">
@@ -59,7 +58,7 @@ export default function WorkoutDetails() {
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={handleAddExercise}>Add exercise</Button>
+        <SelectExercise workout={workout} />
       </div>
     </div>
   );

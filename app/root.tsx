@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLoaderData,
   useNavigation,
   useRouteError,
 } from "@remix-run/react";
@@ -14,6 +15,7 @@ import { api } from "~/lib/api";
 
 import { Navbar } from "./components/navbar";
 import { Toaster } from "./components/ui/toaster";
+import { WorkoutsContext } from "./hooks/use-workouts";
 import "./tailwind.css";
 
 export const meta: MetaFunction = () => {
@@ -55,14 +57,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const { state } = useNavigation();
+  const data = useLoaderData<typeof loader>();
 
   return (
-    <>
-      {state === "loading" && <div className="loader" />}
-      <Outlet />
-      <Navbar />
-      <Toaster />
-    </>
+    <WorkoutsContext.Provider value={data}>
+      <main>
+        {state === "loading" && <div className="loader" />}
+        <Outlet />
+        <Navbar />
+        <Toaster />
+      </main>
+    </WorkoutsContext.Provider>
   );
 }
 
