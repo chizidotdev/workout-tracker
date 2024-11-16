@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
-import { Link, useRouteLoaderData } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import {
   add,
   eachDayOfInterval,
@@ -17,18 +17,15 @@ import {
   startOfToday,
   startOfWeek,
 } from "date-fns";
-import { ChevronLeftIcon, ChevronRightIcon, Dumbbell, History } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Dumbbell, History, MoveUpRight } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Heading, Paragraph } from "~/components/ui/text";
+import { useWorkouts } from "~/hooks/use-workouts";
 import { WorkoutsResponse } from "~/lib/types";
 import { cn } from "~/lib/utils";
-import { loader } from "~/root";
 
 export default function Logs() {
-  const data = useRouteLoaderData<typeof loader>("root");
-
-  if (!data) return null;
-  const { workouts } = data;
+  const { workouts } = useWorkouts();
 
   let today = startOfToday();
   let [selectedDay, setSelectedDay] = useState(today);
@@ -82,12 +79,12 @@ export default function Logs() {
         {days.map((day, dayIdx) => (
           <div
             key={day.toString()}
-            className={cn(
-              dayIdx === 0 && colStartClasses[getDay(day)],
-              workouts.some((meeting) => isSameDay(parseISO(meeting.date), day)) &&
-                "border-t border-primary"
-            )}
+            className={cn(dayIdx === 0 && colStartClasses[getDay(day)], "relative")}
           >
+            {workouts.some((meeting) => isSameDay(parseISO(meeting.date), day)) && (
+              <div className="absolute inset-x-0 bottom-4 mx-auto size-1 rounded-full bg-primary" />
+            )}
+
             <button
               type="button"
               onClick={() => setSelectedDay(day)}
@@ -115,7 +112,7 @@ export default function Logs() {
         ))}
       </div>
 
-      <section className="mt-10">
+      <section className="mt-4 border-t pt-6">
         <Heading variant="h4">
           <time dateTime={format(selectedDay, "yyyy-MM-dd")}>
             {format(selectedDay, "eeee - MMMM dd, yyy")}
@@ -146,11 +143,12 @@ function WorkoutEntry({ workout }: { workout: WorkoutsResponse }) {
   let startDateTime = parseISO(workout.date);
 
   return (
-    <Link to={`/workout/${workout.id}`}>
-      <li className="flex items-center gap-2">
+    <Link to={`/workout/${workout.id}`} className="flex w-full items-center gap-2 py-3">
+      <li className="flex w-full items-center gap-2">
         <History className="size-4 text-muted-foreground" />
         <Paragraph>Log</Paragraph> -{" "}
         <time dateTime={workout.date}>{format(startDateTime, "h:mm a")}</time>
+        <MoveUpRight className="ml-auto size-4" />
       </li>
     </Link>
   );

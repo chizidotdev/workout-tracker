@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useRevalidator, useRouteLoaderData } from "@remix-run/react";
+import { useRevalidator } from "@remix-run/react";
 import { Check } from "lucide-react";
 import {
   Command,

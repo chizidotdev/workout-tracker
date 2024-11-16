@@ -12,6 +12,7 @@ import { Input } from "~/components/ui/input";
 import { Heading, Paragraph } from "~/components/ui/text";
 import { useToast } from "~/hooks/use-toast";
 import { api } from "~/lib/api";
+import { ExerciseSet } from "~/lib/custom-types";
 import { ExercisesResponse, WorkoutExercisesResponse } from "~/lib/types";
 
 export const loader = async ({ params }: ClientLoaderFunctionArgs) => {
@@ -64,7 +65,6 @@ export default function WorkoutDetails() {
   );
 }
 
-type ExerciseSet = { weight: number; reps: number };
 function WorkoutExercise({
   exercise,
 }: {
@@ -137,14 +137,14 @@ function WorkoutExercise({
       </div>
 
       <CollapsibleContent>
-        <div className="mt-2 grid grid-cols-[10%,1fr,1fr,1fr] gap-x-4 gap-y-1">
-          <Paragraph className="text-sm font-medium uppercase" variant="label">
+        <div className="mt-2 grid grid-cols-[10%,1fr,1fr,1fr] gap-x-4 gap-y-2">
+          <Paragraph className="text-xs font-medium uppercase" variant="label">
             Set
           </Paragraph>
-          <Paragraph className="text-sm font-medium uppercase" variant="label">
+          <Paragraph className="text-xs font-medium uppercase" variant="label">
             Weight
           </Paragraph>
-          <Paragraph className="text-sm font-medium uppercase" variant="label">
+          <Paragraph className="text-xs font-medium uppercase" variant="label">
             Reps
           </Paragraph>
           <div />

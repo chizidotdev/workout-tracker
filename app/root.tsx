@@ -6,11 +6,10 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
-  useLoaderData,
   useNavigation,
   useRouteError,
 } from "@remix-run/react";
-import { cacheClientLoader } from "remix-client-cache";
+import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
 import { api } from "~/lib/api";
 
 import { Navbar } from "./components/navbar";
@@ -57,10 +56,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const { state } = useNavigation();
-  const data = useLoaderData<typeof loader>();
+  const data = useCachedLoaderData<typeof loader>();
 
   return (
-    <WorkoutsContext.Provider value={data}>
+    <WorkoutsContext.Provider
+      value={{
+        workouts: data?.workouts || [],
+        exercises: data?.exercises || [],
+      }}
+    >
       <main>
         {state === "loading" && <div className="loader" />}
         <Outlet />

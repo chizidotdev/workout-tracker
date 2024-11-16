@@ -6,9 +6,10 @@ import { Paragraph } from "./ui/text";
 
 export function Navbar() {
   return (
-    <div className="fixed inset-x-0 bottom-4 z-50 mx-8 flex h-20 items-center justify-around gap-2 rounded-full border bg-background p-4">
+    <div className="fixed inset-x-0 bottom-4 z-50 mx-auto flex w-[85vw] max-w-md items-center justify-around gap-2 rounded-full border bg-background px-4 py-3">
       {navLinks.map((link) => (
         <NavLink
+          key={link.title}
           to={link.href}
           className={({ isActive }) =>
             cn(
