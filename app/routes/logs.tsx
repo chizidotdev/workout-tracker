@@ -22,10 +22,10 @@ import { Button } from "~/components/ui/button";
 import { Heading, Paragraph } from "~/components/ui/text";
 import { WorkoutsResponse } from "~/lib/types";
 import { cn } from "~/lib/utils";
-import { clientLoader } from "~/root";
+import { loader } from "~/root";
 
 export default function Logs() {
-  const data = useRouteLoaderData<typeof clientLoader>("root");
+  const data = useRouteLoaderData<typeof loader>("root");
 
   if (!data) return null;
   const { workouts } = data;

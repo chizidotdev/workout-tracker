@@ -2,10 +2,10 @@ import { Link, useRouteLoaderData } from "@remix-run/react";
 import { Dumbbell, History } from "lucide-react";
 import { Heading, Paragraph } from "~/components/ui/text";
 import { formatDate } from "~/lib/utils";
-import { clientLoader } from "~/root";
+import { loader } from "~/root";
 
 export default function Index() {
-  const data = useRouteLoaderData<typeof clientLoader>("root");
+  const data = useRouteLoaderData<typeof loader>("root");
 
   if (!data) return null;
 

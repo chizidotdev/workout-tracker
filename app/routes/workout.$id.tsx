@@ -1,16 +1,10 @@
 import { useState } from "react";
 
-import {
-  ClientLoaderFunctionArgs,
-  Link,
-  Outlet,
-  redirect,
-  useLoaderData,
-  useRevalidator,
-} from "@remix-run/react";
+import { ClientLoaderFunctionArgs, Link, Outlet, redirect, useRevalidator } from "@remix-run/react";
 import { formatRelative } from "date-fns";
 import { ChevronsUpDown, Dumbbell, Loader, Plus, Trash2, Upload } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
+import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
 import { Button } from "~/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
 import { Input } from "~/components/ui/input";
@@ -37,8 +31,11 @@ export const loader = async ({ params }: ClientLoaderFunctionArgs) => {
   return { workout, workoutExercises };
 };
 
+export const clientLoader = cacheClientLoader;
+(clientLoader as any).hydrate = true;
+
 export default function WorkoutDetails() {
-  const { workout, workoutExercises } = useLoaderData<typeof loader>();
+  const { workout, workoutExercises } = useCachedLoaderData<typeof loader>();
 
   return (
     <div className="space-y-6 pt-20">

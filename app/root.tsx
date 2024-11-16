@@ -1,6 +1,5 @@
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
-  ClientLoaderFunctionArgs,
   Links,
   Meta,
   Outlet,
@@ -10,6 +9,7 @@ import {
   useNavigation,
   useRouteError,
 } from "@remix-run/react";
+import { cacheClientLoader } from "remix-client-cache";
 import { api } from "~/lib/api";
 
 import { Navbar } from "./components/navbar";
@@ -31,23 +31,8 @@ export const loader = async () => {
   return { workouts, exercises };
 };
 
-const CACHE_KEY = "_track_server_cache";
-export const clientLoader = async ({
-  serverLoader,
-}: ClientLoaderFunctionArgs): Promise<Awaited<ReturnType<typeof loader>>> => {
-  const cache = localStorage;
-  const cachedServerData = cache.getItem(CACHE_KEY);
-  if (cachedServerData) {
-    return JSON.parse(cachedServerData);
-  }
-
-  const serverData = await serverLoader();
-  cache.setItem(CACHE_KEY, JSON.stringify(serverData));
-
-  return serverData as Awaited<ReturnType<typeof loader>>;
-};
-
-clientLoader.hydrate = true;
+export const clientLoader = cacheClientLoader;
+(clientLoader as any).hydrate = true;
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
