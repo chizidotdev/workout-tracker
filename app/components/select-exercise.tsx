@@ -40,9 +40,15 @@ export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
       return;
     }
 
+    const user = api.authStore.model;
+    if (!user) {
+      return;
+    }
+
     setIsLoading(true);
     try {
       await api.collection("workout_exercises").create({
+        user_id: user.id,
         workout_id: workout.id,
         exercise_id: selectedExercise.id,
         sets: [],

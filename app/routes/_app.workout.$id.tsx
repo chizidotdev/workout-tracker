@@ -1,27 +1,39 @@
 import { useState } from "react";
 
-import { ClientLoaderFunctionArgs, Link, redirect, useRevalidator } from "@remix-run/react";
+import {
+  ClientLoaderFunctionArgs,
+  Link,
+  redirect,
+  useLoaderData,
+  useRevalidator,
+} from "@remix-run/react";
 import { format } from "date-fns";
-import { ChevronsUpDown, Dumbbell, Loader, Plus, Trash2, Upload } from "lucide-react";
-import { ChevronLeft } from "lucide-react";
-import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
+import { ChevronLeft, ChevronsUpDown, Dumbbell, Loader, Plus, Trash2, Upload } from "lucide-react";
 import { SelectExercise } from "~/components/select-exercise";
 import { Button } from "~/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
 import { Input } from "~/components/ui/input";
 import { Heading, Paragraph } from "~/components/ui/text";
 import { useToast } from "~/hooks/use-toast";
-import { api } from "~/lib/api";
+import { api, queryClient } from "~/lib/api";
 import { ExerciseSet } from "~/lib/custom-types";
-import { ExercisesResponse, WorkoutExercisesResponse } from "~/lib/types";
+import { ExercisesResponse, WorkoutExercisesResponse, WorkoutsResponse } from "~/lib/types";
 
-export const loader = async ({ params }: ClientLoaderFunctionArgs) => {
+const workoutExercisesQueryKey = (workoutId: string) => ["workout-exercises", workoutId];
+
+export const clientLoader = async ({ params }: ClientLoaderFunctionArgs) => {
   if (!params.id) {
     return redirect("/");
   }
 
-  const workout = await api.collection("workouts").getOne(params.id);
+  const key = workoutExercisesQueryKey(params.id);
+  const data = queryClient.getQueryData<{
+    workout: WorkoutsResponse;
+    workoutExercises: WorkoutExercisesResponse<ExerciseSet[], { exercise_id: ExercisesResponse }>[];
+  }>(key);
+  if (data) return data;
 
+  const workout = await api.collection("workouts").getOne(params.id);
   const workoutExercises = await api
     .collection("workout_exercises")
     .getFullList<WorkoutExercisesResponse<ExerciseSet[], { exercise_id: ExercisesResponse }>>({
@@ -30,14 +42,13 @@ export const loader = async ({ params }: ClientLoaderFunctionArgs) => {
       expand: "exercise_id",
     });
 
+  queryClient.setQueryData(key, { workout, workoutExercises });
+
   return { workout, workoutExercises };
 };
 
-export const clientLoader = cacheClientLoader;
-(clientLoader as any).hydrate = true;
-
 export default function WorkoutDetails() {
-  const { workout, workoutExercises } = useCachedLoaderData<typeof loader>();
+  const { workout, workoutExercises } = useLoaderData<typeof clientLoader>();
 
   return (
     <div className="space-y-6 pt-20">
@@ -74,7 +85,8 @@ function WorkoutExercise({
   const { toast } = useToast();
   const revalidator = useRevalidator();
 
-  const exerciseInfo = exercise.expand?.exercise_id!;
+  if (!exercise.expand?.exercise_id) return null;
+  const exerciseInfo = exercise.expand.exercise_id;
 
   const isOutOfSync = sets.length !== exercise.sets?.length;
 
@@ -111,7 +123,7 @@ function WorkoutExercise({
 
   async function saveChanges(sets: ExerciseSet[]) {
     try {
-      await api.collection("workout_exercises").update(exercise.id, { sets }, { requestKey: null });
+      await api.collection("workout_exercises").update(exercise.id, { sets });
     } catch (error) {
       const description = error instanceof Error ? error.message : "Something went wrong";
       toast({ title: "Error", description });

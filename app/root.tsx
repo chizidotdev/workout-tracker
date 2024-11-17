@@ -9,9 +9,12 @@ import {
   useNavigation,
   useRouteError,
 } from "@remix-run/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Dumbbell } from "lucide-react";
 
+import { Heading } from "./components/ui/text";
 import { Toaster } from "./components/ui/toaster";
+import { queryClient } from "./lib/api";
 import "./tailwind.css";
 
 export const meta: MetaFunction = () => {
@@ -39,14 +42,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: Infinity, // 1000 * 60 * 10,
-    },
-  },
-});
-
 export default function App() {
   const { state } = useNavigation();
 
@@ -64,19 +59,27 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     return (
-      <>
-        <h1>
+      <div className="container mt-28">
+        <Heading variant="h2">
           {error.status} {error.statusText}
-        </h1>
+        </Heading>
         <p>{error.data}</p>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <h1>Error!</h1>
+    <div className="container mt-28">
+      <Heading variant="h2">Error!</Heading>
       <p>{(error as any)?.message ?? "Unknown error"}</p>
-    </>
+    </div>
+  );
+}
+
+export function HydrateFallback() {
+  return (
+    <div className="flex h-[50dvh] items-end justify-center">
+      <Dumbbell className="size-10 text-primary" />
+    </div>
   );
 }

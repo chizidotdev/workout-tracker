@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 
 import { Link } from "@remix-run/react";
 import {
@@ -27,27 +27,27 @@ import { cn } from "~/lib/utils";
 export default function Logs() {
   const { workouts } = useWorkouts();
 
-  let today = startOfToday();
-  let [selectedDay, setSelectedDay] = useState(today);
-  let [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
-  let firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
+  const today = startOfToday();
+  const [selectedDay, setSelectedDay] = useState(today);
+  const [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
+  const firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
 
-  let days = eachDayOfInterval({
+  const days = eachDayOfInterval({
     start: startOfWeek(firstDayCurrentMonth),
     end: endOfWeek(endOfMonth(firstDayCurrentMonth)),
   });
 
   function previousMonth() {
-    let firstDayNextMonth = add(firstDayCurrentMonth, { months: -1 });
+    const firstDayNextMonth = add(firstDayCurrentMonth, { months: -1 });
     setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   }
 
   function nextMonth() {
-    let firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
+    const firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
     setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   }
 
-  let selectedDayMeetings = workouts.filter((workout) =>
+  const selectedDayMeetings = workouts.filter((workout) =>
     isSameDay(parseISO(workout.date), selectedDay)
   );
 
@@ -65,7 +65,7 @@ export default function Logs() {
         </Button>
       </div>
 
-      <div className="-mx-3 mt-6 grid grid-cols-7 text-center text-xs font-medium leading-6 text-muted-foreground">
+      <div className="mt-6 grid grid-cols-7 text-center text-xs font-medium leading-6 text-muted-foreground">
         <div>M</div>
         <div>T</div>
         <div>W</div>
@@ -75,7 +75,7 @@ export default function Logs() {
         <div>S</div>
       </div>
 
-      <div className="-mx-4 mt-4 grid grid-cols-7 gap-1 text-sm">
+      <div className="mt-4 grid grid-cols-7 gap-1 text-sm">
         {days.map((day, dayIdx) => (
           <div
             key={day.toString()}
@@ -103,7 +103,7 @@ export default function Logs() {
                 isEqual(day, selectedDay) && !isToday(day) && "bg-muted",
                 !isEqual(day, selectedDay) && "hover:bg-muted",
                 (isEqual(day, selectedDay) || isToday(day)) && "font-semibold",
-                "mx-auto flex size-full items-center justify-center pb-10 pt-2"
+                "mx-auto flex size-full items-center justify-center rounded-lg pb-10 pt-2"
               )}
             >
               <time dateTime={format(day, "yyyy-MM-dd")}>{format(day, "d")}</time>
@@ -140,7 +140,7 @@ export default function Logs() {
 }
 
 function WorkoutEntry({ workout }: { workout: WorkoutsResponse }) {
-  let startDateTime = parseISO(workout.date);
+  const startDateTime = parseISO(workout.date);
 
   return (
     <Link to={`/workout/${workout.id}`} className="flex w-full items-center gap-2 py-3">
@@ -154,7 +154,7 @@ function WorkoutEntry({ workout }: { workout: WorkoutsResponse }) {
   );
 }
 
-let colStartClasses = [
+const colStartClasses = [
   "",
   "col-start-2",
   "col-start-3",

@@ -1,14 +1,14 @@
 import { format } from "date-fns";
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+  CartesianGrid,
+  Line,
+  LineChart,
+  PolarAngleAxis,
+  PolarGrid,
+  Radar,
+  RadarChart,
+  XAxis,
+} from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -51,12 +51,12 @@ export function RepsPerMuscle({
   }));
 
   return (
-    <Card>
-      <CardHeader className="items-center pb-4">
-        <CardTitle>Radar Chart - Grid Circle</CardTitle>
-        <CardDescription>Showing total of sets and reps per muscle group.</CardDescription>
-      </CardHeader>
-      <CardContent className="pb-0">
+    <div>
+      <div className="flex flex-col items-center pb-4">
+        <div>Radar Chart - Grid Circle</div>
+        <div>Showing total of sets and reps per muscle group.</div>
+      </div>
+      <div className="pb-0">
         <ChartContainer config={chartConfig} className="mx-auto aspect-[1.3]">
           <RadarChart data={repsPerMuscleData}>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
@@ -70,14 +70,14 @@ export function RepsPerMuscle({
             />
           </RadarChart>
         </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
+      </div>
+      <div className="flex-col gap-2 text-sm">
         <Paragraph variant="label" className="mt-4 text-sm">
           The closer this chart is to a circle, the more balanced your workout routine is. See for
           yourself
         </Paragraph>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
 

@@ -1,35 +1,54 @@
-import { Link } from "@remix-run/react";
+import { Link, redirect, useLoaderData } from "@remix-run/react";
 import { Dumbbell, History, MoveUpRight } from "lucide-react";
+import { RecordAuthResponse } from "pocketbase";
 import { Fragment } from "react/jsx-runtime";
-import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
 import { RepsPerMuscle } from "~/components/chart-visuals";
 import { Button } from "~/components/ui/button";
-import { Heading } from "~/components/ui/text";
-import { Paragraph } from "~/components/ui/text";
+import { Heading, Paragraph } from "~/components/ui/text";
 import { useWorkouts } from "~/hooks/use-workouts";
-import { api } from "~/lib/api";
+import { api, authQueryKey, queryClient } from "~/lib/api";
 import { WorkoutExercisesExpanded } from "~/lib/custom-types";
-import { WorkoutsResponse } from "~/lib/types";
-import { formatDate } from "~/lib/utils";
+import { UsersResponse } from "~/lib/types";
+import { cn, formatDate } from "~/lib/utils";
 
-export const loader = async () => {
+const workoutExercisesQueryKey = ["workoutsExercises"];
+
+export const clientLoader = async () => {
+  let userData = queryClient.getQueryData<RecordAuthResponse<UsersResponse<unknown>>>(authQueryKey);
+
+  try {
+    if (!userData) {
+      userData = await api.collection("users").authRefresh();
+      queryClient.setQueryData(authQueryKey, userData);
+    }
+  } catch (e) {
+    return redirect("/login");
+  }
+
+  if (!userData.record) {
+    return redirect("/login");
+  }
+
+  const data = queryClient.getQueryData<{ workoutExercises: WorkoutExercisesExpanded[] }>(
+    workoutExercisesQueryKey
+  );
+  if (data) return data;
+
   const workoutExercises = await api
     .collection("workout_exercises")
     .getFullList<WorkoutExercisesExpanded>({
-      sort: "+created",
       expand: "exercise_id,workout_id",
-      requestKey: null,
+      sort: "+created",
+      filter: `user_id="${userData.record.id}"`,
     });
+
+  queryClient.setQueryData(workoutExercisesQueryKey, { workoutExercises });
 
   return { workoutExercises };
 };
 
-export const clientLoader = cacheClientLoader;
-(clientLoader as any).hydrate = true;
-
-export default function Index() {
-  const { workoutExercises } = useCachedLoaderData<typeof loader>();
-  const { workouts } = useWorkouts();
+export default function HomeRoute() {
+  const { workoutExercises } = useLoaderData<typeof clientLoader>();
 
   return (
     <>
@@ -43,19 +62,21 @@ export default function Index() {
           {/* <MostRecurringWorkout workoutExercises={workoutExercises} /> */}
         </section>
 
-        <div className="flex flex-col gap-2">
-          <Heading className="mb-2" variant="h3">
+        <div>
+          <Heading className="mb-4" variant="h3">
             Recent Activity
           </Heading>
 
-          <WorkoutsList workouts={workouts} />
+          <WorkoutsList />
         </div>
       </div>
     </>
   );
 }
 
-export function WorkoutsList({ workouts }: { workouts: WorkoutsResponse[] }) {
+function WorkoutsList() {
+  const { workouts } = useWorkouts();
+
   if (!workouts.length) {
     <div className="my-10 space-y-4 text-center">
       <Paragraph variant="label">No workouts logged.</Paragraph>
@@ -70,10 +91,10 @@ export function WorkoutsList({ workouts }: { workouts: WorkoutsResponse[] }) {
 
   return (
     <>
-      {workouts.slice(1, 6).map((workout) => (
+      {workouts.slice(1, 6).map((workout, idx) => (
         <Fragment key={workout.id}>
-          <div className="w-full border-t" />
-          <Link to={`/workout/${workout.id}`} className="flex items-center gap-2 py-3">
+          <div className={cn("w-full", idx !== 0 && "border-t")} />
+          <Link to={`/workout/${workout.id}`} className="flex items-center gap-2 py-4">
             <History className="size-4" />
             <Paragraph>{formatDate(workout.date)}</Paragraph>
             <MoveUpRight className="ml-auto size-4" />
@@ -81,7 +102,7 @@ export function WorkoutsList({ workouts }: { workouts: WorkoutsResponse[] }) {
         </Fragment>
       ))}
 
-      <Link to="/workout" className="mx-auto mt-8 w-fit">
+      <Link to="/workout" className="mx-auto mt-8 block w-fit">
         <Button>
           <Dumbbell />
           New workout
