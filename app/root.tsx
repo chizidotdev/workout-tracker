@@ -9,6 +9,7 @@ import {
   useNavigation,
   useRouteError,
 } from "@remix-run/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
 import { api } from "~/lib/api";
 
@@ -54,24 +55,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity, // 1000 * 60 * 10,
+    },
+  },
+});
+
 export default function App() {
   const { state } = useNavigation();
   const data = useCachedLoaderData<typeof loader>();
 
   return (
-    <WorkoutsContext.Provider
-      value={{
-        workouts: data?.workouts || [],
-        exercises: data?.exercises || [],
-      }}
-    >
-      <main>
-        {state === "loading" && <div className="loader" />}
-        <Outlet />
-        <Navbar />
-        <Toaster />
-      </main>
-    </WorkoutsContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <WorkoutsContext.Provider
+        value={{
+          workouts: data?.workouts || [],
+          exercises: data?.exercises || [],
+        }}
+      >
+        <main>
+          {state === "loading" && <div className="loader" />}
+          <Outlet />
+          <Navbar />
+          <Toaster />
+        </main>
+      </WorkoutsContext.Provider>
+    </QueryClientProvider>
   );
 }
 
