@@ -10,12 +10,8 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
-import { api } from "~/lib/api";
 
-import { Navbar } from "./components/navbar";
 import { Toaster } from "./components/ui/toaster";
-import { WorkoutsContext } from "./hooks/use-workouts";
 import "./tailwind.css";
 
 export const meta: MetaFunction = () => {
@@ -23,18 +19,6 @@ export const meta: MetaFunction = () => {
 };
 
 export const links: LinksFunction = () => [];
-
-export const loader = async () => {
-  const [workouts, exercises] = await Promise.all([
-    api.collection("workouts").getFullList({ sort: "-date" }),
-    api.collection("exercises").getFullList(),
-  ]);
-
-  return { workouts, exercises };
-};
-
-export const clientLoader = cacheClientLoader;
-(clientLoader as any).hydrate = true;
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -65,23 +49,12 @@ export const queryClient = new QueryClient({
 
 export default function App() {
   const { state } = useNavigation();
-  const data = useCachedLoaderData<typeof loader>();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WorkoutsContext.Provider
-        value={{
-          workouts: data?.workouts || [],
-          exercises: data?.exercises || [],
-        }}
-      >
-        <main>
-          {state === "loading" && <div className="loader" />}
-          <Outlet />
-          <Navbar />
-          <Toaster />
-        </main>
-      </WorkoutsContext.Provider>
+      {state === "loading" && <div className="loader" />}
+      <Outlet />
+      <Toaster />
     </QueryClientProvider>
   );
 }
