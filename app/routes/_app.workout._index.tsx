@@ -1,4 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate, useRevalidator } from "@remix-run/react";
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -19,8 +21,10 @@ import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { Heading } from "~/components/ui/text";
 import { Textarea } from "~/components/ui/textarea";
 import { useToast } from "~/hooks/use-toast";
-import { api } from "~/lib/api";
+import { api, queryClient } from "~/lib/api";
 import { cn } from "~/lib/utils";
+
+import { workoutsQueryKey } from "./_app";
 
 const FormSchema = z.object({
   date: z.date({
@@ -30,7 +34,22 @@ const FormSchema = z.object({
 });
 
 export default function SomeParent() {
+  const revalidator = useRevalidator();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: object) => api.collection("workouts").create(data),
+    onSuccess: async (result) => {
+      navigate(`/workout/${result.id}`);
+      await queryClient.invalidateQueries({ queryKey: workoutsQueryKey });
+      revalidator.revalidate();
+    },
+    onError: (error) =>
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Something went wrong",
+      }),
+  });
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: { date: new Date(), notes: "" },
@@ -41,19 +60,11 @@ export default function SomeParent() {
 
     if (!user) return;
 
-    try {
-      await api.collection("workouts").create({
-        user_id: user.id,
-        date: data.date,
-        notes: data.notes,
-      });
-    } catch (error) {
-      const description = error instanceof Error ? error.message : "Something went wrong";
-      toast({
-        title: "Error",
-        description,
-      });
-    }
+    mutate({
+      user_id: user.id,
+      date: data.date,
+      notes: data.notes,
+    });
   }
 
   function handleDateSelect(date: Date | undefined) {
@@ -211,7 +222,9 @@ export default function SomeParent() {
             )}
           />
 
-          <Button type="submit">Create workout</Button>
+          <Button isLoading={isPending} type="submit">
+            Create workout
+          </Button>
         </form>
       </Form>
     </div>

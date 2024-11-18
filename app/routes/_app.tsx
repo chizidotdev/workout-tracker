@@ -5,7 +5,7 @@ import { WorkoutsContext } from "~/hooks/use-workouts";
 import { api, authQueryKey, queryClient } from "~/lib/api";
 import { ExercisesResponse, UsersResponse, WorkoutsResponse } from "~/lib/types";
 
-const workoutsQueryKey = ["workouts"];
+export const workoutsQueryKey = ["workouts"];
 
 export const clientLoader = async () => {
   let userData = queryClient.getQueryData<RecordAuthResponse<UsersResponse<unknown>>>(authQueryKey);

@@ -17,7 +17,7 @@ const MotionParagraph = motion(Paragraph);
 export function Navbar() {
   return (
     <>
-      <nav className="fixed inset-x-1 bottom-6 z-50 mx-auto flex w-[85vw] max-w-80 items-center justify-around gap-2">
+      <nav className="fixed inset-x-1 bottom-4 z-50 mx-auto flex w-[85vw] max-w-80 items-center justify-around gap-2">
         {navLinks.map((link) => (
           <NavLink key={link.title} to={link.href}>
             {({ isActive }) => (

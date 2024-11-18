@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { useRevalidator } from "@remix-run/react";
+import { useMutation } from "@tanstack/react-query";
 import { Check } from "lucide-react";
 import {
   Command,
@@ -21,19 +22,31 @@ import {
 } from "~/components/ui/drawer";
 import { useToast } from "~/hooks/use-toast";
 import { useWorkouts } from "~/hooks/use-workouts";
-import { api } from "~/lib/api";
+import { api, queryClient } from "~/lib/api";
 import { ExercisesResponse, WorkoutsResponse } from "~/lib/types";
 import { cn } from "~/lib/utils";
+import { workoutExercisesQueryKey } from "~/routes/_app.workout.$id";
 
 import { Button } from "./ui/button";
 
 export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
   const [selectedExercise, setSelectedExercise] = useState<ExercisesResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const { exercises } = useWorkouts();
 
   const { toast } = useToast();
   const revalidator = useRevalidator();
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: object) => api.collection("workout_exercises").create(data),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: workoutExercisesQueryKey(workout.id) });
+      revalidator.revalidate();
+    },
+    onError: (error) =>
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Something went wrong",
+      }),
+  });
 
   async function handleAddExercise() {
     if (!selectedExercise) {
@@ -41,31 +54,20 @@ export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
     }
 
     const user = api.authStore.model;
-    if (!user) {
-      return;
-    }
+    if (!user) return;
 
-    setIsLoading(true);
-    try {
-      await api.collection("workout_exercises").create({
-        user_id: user.id,
-        workout_id: workout.id,
-        exercise_id: selectedExercise.id,
-        sets: [],
-      });
-    } catch (error) {
-      const description = error instanceof Error ? error.message : "Something went wrong";
-      toast({ title: "Error", description });
-    } finally {
-      setIsLoading(false);
-      revalidator.revalidate();
-    }
+    mutate({
+      user_id: user.id,
+      workout_id: workout.id,
+      exercise_id: selectedExercise.id,
+      sets: [{ reps: 10, weight: 10 }],
+    });
   }
 
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button>Add exercise</Button>
+        <Button className="mx-auto">Add exercise</Button>
       </DrawerTrigger>
       <DrawerContent className="px-4">
         <DrawerHeader>
@@ -104,7 +106,7 @@ export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
         </Command>
 
         <DrawerFooter>
-          <Button isLoading={isLoading} onClick={handleAddExercise}>
+          <Button isLoading={isPending} onClick={handleAddExercise}>
             Submit
           </Button>
           <DrawerClose asChild>

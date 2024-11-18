@@ -19,7 +19,7 @@ import { api, queryClient } from "~/lib/api";
 import { ExerciseSet } from "~/lib/custom-types";
 import { ExercisesResponse, WorkoutExercisesResponse, WorkoutsResponse } from "~/lib/types";
 
-const workoutExercisesQueryKey = (workoutId: string) => ["workout-exercises", workoutId];
+export const workoutExercisesQueryKey = (workoutId: string) => ["workout-exercises", workoutId];
 
 export const clientLoader = async ({ params }: ClientLoaderFunctionArgs) => {
   if (!params.id) {
@@ -70,7 +70,7 @@ export default function WorkoutDetails() {
       </div>
 
       <div className="flex justify-end">
-        <SelectExercise workout={workout} />
+        <SelectExercise key={workoutExercises.length} workout={workout} />
       </div>
     </div>
   );

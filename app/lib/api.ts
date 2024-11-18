@@ -11,14 +11,4 @@ api.autoCancellation(false);
 
 export const authQueryKey = ["auth"];
 
-export const queryClient = remember(
-  "react-query",
-  () =>
-    new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: Infinity, // 1000 * 60 * 10,
-        },
-      },
-    })
-);
+export const queryClient = remember("react-query", () => new QueryClient());
