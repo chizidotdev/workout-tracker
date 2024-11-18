@@ -1,4 +1,4 @@
-import { redirect, useLoaderData, useNavigate } from "@remix-run/react";
+import { redirect, useLoaderData, useNavigate, useRevalidator } from "@remix-run/react";
 import { RecordAuthResponse } from "pocketbase";
 import { Button } from "~/components/ui/button";
 import { Heading, Paragraph } from "~/components/ui/text";
@@ -22,10 +22,12 @@ export const clientLoader = async () => {
 export default function SomeParent() {
   const navigate = useNavigate();
   const userData = useLoaderData<typeof clientLoader>();
+  const revalidator = useRevalidator();
 
   function logout() {
     api.authStore.clear();
-    queryClient.invalidateQueries({ queryKey: authQueryKey });
+    queryClient.invalidateQueries();
+    revalidator.revalidate();
     return navigate("/login");
   }
 

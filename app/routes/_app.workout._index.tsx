@@ -24,7 +24,6 @@ import { useToast } from "~/hooks/use-toast";
 import { api, queryClient } from "~/lib/api";
 import { cn } from "~/lib/utils";
 
-import { workoutsQueryKey } from "./_app";
 
 const FormSchema = z.object({
   date: z.date({
@@ -41,7 +40,7 @@ export default function SomeParent() {
     mutationFn: (data: object) => api.collection("workouts").create(data),
     onSuccess: async (result) => {
       navigate(`/workout/${result.id}`);
-      await queryClient.invalidateQueries({ queryKey: workoutsQueryKey });
+      await queryClient.invalidateQueries();
       revalidator.revalidate();
     },
     onError: (error) =>

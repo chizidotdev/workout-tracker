@@ -11,7 +11,7 @@ import { WorkoutExercisesExpanded } from "~/lib/custom-types";
 import { UsersResponse } from "~/lib/types";
 import { cn, formatDate } from "~/lib/utils";
 
-const workoutExercisesQueryKey = ["workoutsExercises"];
+const workoutExercisesQueryKey = ["workouts-exercises"];
 
 export const clientLoader = async () => {
   let userData = queryClient.getQueryData<RecordAuthResponse<UsersResponse<unknown>>>(authQueryKey);
@@ -63,10 +63,6 @@ export default function HomeRoute() {
         </section>
 
         <div>
-          <Heading className="mb-4" variant="h3">
-            Recent Activity
-          </Heading>
-
           <WorkoutsList />
         </div>
       </div>
@@ -78,19 +74,25 @@ function WorkoutsList() {
   const { workouts } = useWorkouts();
 
   if (!workouts.length) {
-    <div className="my-10 space-y-4 text-center">
-      <Paragraph variant="label">No workouts logged.</Paragraph>
-      <Link to="/workout" className="mx-auto mt-8 w-fit">
-        <Button>
-          <Dumbbell />
-          New workout
-        </Button>
-      </Link>
-    </div>;
+    return (
+      <div className="my-10 space-y-4 text-center">
+        <Paragraph variant="label">No workouts logged.</Paragraph>
+        <Link to="/workout" className="mx-auto mt-8 block w-fit">
+          <Button>
+            <Dumbbell />
+            New workout
+          </Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
     <>
+      <Heading className="mb-4" variant="h3">
+        Recent Activity
+      </Heading>
+
       {workouts.slice(0, 5).map((workout, idx) => (
         <Fragment key={workout.id}>
           <div className={cn("w-full", idx !== 0 && "border-t")} />

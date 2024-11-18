@@ -1,19 +1,19 @@
 import { format } from "date-fns";
 import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  PolarAngleAxis,
-  PolarGrid,
-  Radar,
-  RadarChart,
-  XAxis,
+    CartesianGrid,
+    Line,
+    LineChart,
+    PolarAngleAxis,
+    PolarGrid,
+    Radar,
+    RadarChart,
+    XAxis,
 } from "recharts";
 import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
+    ChartConfig,
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
 } from "~/components/ui/chart";
 import { WorkoutExercisesExpanded } from "~/lib/custom-types";
 
@@ -35,6 +35,8 @@ export function RepsPerMuscle({
 }: {
   workoutExercises: WorkoutExercisesExpanded[];
 }) {
+  if (!workoutExercises.length) return null;
+
   const muscleGroupReps = workoutExercises.reduce(
     (groups, item) => {
       const muscleGroup = item.expand?.exercise_id.muscle_group || "Unknown";

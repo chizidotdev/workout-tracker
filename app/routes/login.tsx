@@ -53,8 +53,8 @@ export default function Login() {
         </Button>
       </form>
 
-      <Link to="/register" className="fixed bottom-6 left-4">
-        <Button variant="outline">Request account.</Button>
+      <Link to="#" className="mt-4 flex w-full flex-col">
+        <Button variant="ghost">Request account.</Button>
       </Link>
     </div>
   );

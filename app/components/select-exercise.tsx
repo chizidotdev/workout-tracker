@@ -38,7 +38,7 @@ export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
   const { mutate, isPending } = useMutation({
     mutationFn: (data: object) => api.collection("workout_exercises").create(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: workoutExercisesQueryKey(workout.id) });
+      await queryClient.invalidateQueries();
       revalidator.revalidate();
     },
     onError: (error) =>

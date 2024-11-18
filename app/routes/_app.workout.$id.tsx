@@ -65,7 +65,7 @@ export default function WorkoutDetails() {
 
       <div className="space-y-4">
         {workoutExercises.map((exercise) => (
-          <WorkoutExercise key={exercise.id} exercise={exercise} />
+          <WorkoutExercise key={exercise.id} workout={workout} exercise={exercise} />
         ))}
       </div>
 
@@ -77,8 +77,10 @@ export default function WorkoutDetails() {
 }
 
 function WorkoutExercise({
+  workout,
   exercise,
 }: {
+  workout: WorkoutsResponse;
   exercise: WorkoutExercisesResponse<ExerciseSet[], { exercise_id: ExercisesResponse }>;
 }) {
   const [sets, setSets] = useState(exercise.sets ?? []);
@@ -128,6 +130,7 @@ function WorkoutExercise({
       const description = error instanceof Error ? error.message : "Something went wrong";
       toast({ title: "Error", description });
     } finally {
+      await queryClient.invalidateQueries();
       revalidator.revalidate();
     }
   }
