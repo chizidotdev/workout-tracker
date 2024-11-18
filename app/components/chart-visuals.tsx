@@ -51,11 +51,8 @@ export function RepsPerMuscle({
   }));
 
   return (
-    <div>
-      <div className="flex flex-col items-center pb-4">
-        <div>Radar Chart - Grid Circle</div>
-        <div>Showing total of sets and reps per muscle group.</div>
-      </div>
+    <div className="text-center">
+      <Paragraph>Radar chart showing total of sets and reps per muscle group.</Paragraph>
       <div className="pb-0">
         <ChartContainer config={chartConfig} className="mx-auto aspect-[1.3]">
           <RadarChart data={repsPerMuscleData}>

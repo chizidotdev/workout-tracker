@@ -20,7 +20,6 @@ import { Heading } from "~/components/ui/text";
 import { Textarea } from "~/components/ui/textarea";
 import { useToast } from "~/hooks/use-toast";
 import { api } from "~/lib/api";
-import { USER_ID } from "~/lib/constants";
 import { cn } from "~/lib/utils";
 
 const FormSchema = z.object({
@@ -38,9 +37,13 @@ export default function SomeParent() {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const user = api.authStore.model;
+
+    if (!user) return;
+
     try {
       await api.collection("workouts").create({
-        user_id: USER_ID,
+        user_id: user.id,
         date: data.date,
         notes: data.notes,
       });
@@ -61,7 +64,7 @@ export default function SomeParent() {
 
   function handleDateChange(type: "hour" | "minute" | "ampm", value: string) {
     const currentDate = form.getValues("date") || new Date();
-    let newDate = new Date(currentDate);
+    const newDate = new Date(currentDate);
 
     if (type === "hour") {
       const hour = parseInt(value, 10);
