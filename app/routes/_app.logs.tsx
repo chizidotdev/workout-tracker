@@ -66,12 +66,12 @@ export default function Logs() {
       </div>
 
       <div className="mt-6 grid grid-cols-7 text-center text-xs font-medium leading-6 text-muted-foreground">
+        <div>S</div>
         <div>M</div>
         <div>T</div>
         <div>W</div>
         <div>T</div>
         <div>F</div>
-        <div>S</div>
         <div>S</div>
       </div>
 

@@ -91,7 +91,7 @@ function WorkoutsList() {
 
   return (
     <>
-      {workouts.slice(1, 6).map((workout, idx) => (
+      {workouts.slice(0, 5).map((workout, idx) => (
         <Fragment key={workout.id}>
           <div className={cn("w-full", idx !== 0 && "border-t")} />
           <Link to={`/workout/${workout.id}`} className="flex items-center gap-2 py-4">
