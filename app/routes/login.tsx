@@ -23,8 +23,9 @@ export default function Login() {
   const { mutate: signIn, isPending } = useMutation({
     mutationFn: loginUser,
     onSuccess: () => navigate("/"),
-    onError: (error) =>
-      toast({ title: "Error", description: error.message, variant: "destructive" }),
+    onError: (error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
   });
 
   return (

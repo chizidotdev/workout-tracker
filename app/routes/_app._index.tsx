@@ -1,4 +1,5 @@
 import { Link, redirect, useLoaderData } from "@remix-run/react";
+import { format, formatDistanceToNow } from "date-fns";
 import { Dumbbell, History, MoveUpRight } from "lucide-react";
 import { RecordAuthResponse } from "pocketbase";
 import { Fragment } from "react/jsx-runtime";
@@ -9,7 +10,7 @@ import { useWorkouts } from "~/hooks/use-workouts";
 import { api, authQueryKey, queryClient } from "~/lib/api";
 import { WorkoutExercisesExpanded } from "~/lib/custom-types";
 import { UsersResponse } from "~/lib/types";
-import { cn, formatDate } from "~/lib/utils";
+import { cn } from "~/lib/utils";
 
 const workoutExercisesQueryKey = ["workouts-exercises"];
 
@@ -97,8 +98,12 @@ function WorkoutsList() {
         <Fragment key={workout.id}>
           <div className={cn("w-full", idx !== 0 && "border-t")} />
           <Link to={`/workout/${workout.id}`} className="flex items-center gap-2 py-4">
-            <History className="size-4" />
-            <Paragraph>{formatDate(workout.date)}</Paragraph>
+            <History className="size-4 text-muted-foreground" />
+            <Paragraph>
+              {format(workout.date, "eee do")} -{" "}
+              {formatDistanceToNow(workout.date, { addSuffix: true })}
+            </Paragraph>
+
             <MoveUpRight className="ml-auto size-4" />
           </Link>
         </Fragment>
