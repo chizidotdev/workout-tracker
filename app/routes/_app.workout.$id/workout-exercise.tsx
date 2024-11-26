@@ -1,96 +1,27 @@
+import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
-import {
-  ClientLoaderFunctionArgs,
-  Link,
-  redirect,
-  useLoaderData,
-  useRevalidator,
-} from "@remix-run/react";
-import { format } from "date-fns";
-import { ChevronLeft, ChevronsUpDown, Dumbbell, Loader, Plus, Trash2, Upload } from "lucide-react";
-import { SelectExercise } from "~/components/select-exercise";
+import { ChevronsUpDown, Dumbbell, Plus, Trash2, Upload } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
 import { Input } from "~/components/ui/input";
 import { Heading, Paragraph } from "~/components/ui/text";
-import { useToast } from "~/hooks/use-toast";
-import { api, queryClient } from "~/lib/api";
 import { ExerciseSet } from "~/lib/custom-types";
-import { ExercisesResponse, WorkoutExercisesResponse, WorkoutsResponse } from "~/lib/types";
+import { ExercisesResponse, WorkoutExercisesResponse } from "~/lib/types";
 
-export const workoutExercisesQueryKey = (workoutId: string) => ["workout-exercises", workoutId];
+import { action } from "./server";
 
-export const clientLoader = async ({ params }: ClientLoaderFunctionArgs) => {
-  if (!params.id) {
-    return redirect("/");
-  }
-
-  const key = workoutExercisesQueryKey(params.id);
-  const data = queryClient.getQueryData<{
-    workout: WorkoutsResponse;
-    workoutExercises: WorkoutExercisesResponse<ExerciseSet[], { exercise_id: ExercisesResponse }>[];
-  }>(key);
-  if (data) return data;
-
-  const workout = await api.collection("workouts").getOne(params.id);
-  const workoutExercises = await api
-    .collection("workout_exercises")
-    .getFullList<WorkoutExercisesResponse<ExerciseSet[], { exercise_id: ExercisesResponse }>>({
-      filter: `workout_id="${workout.id}"`,
-      sort: "+created",
-      expand: "exercise_id",
-    });
-
-  queryClient.setQueryData(key, { workout, workoutExercises });
-
-  return { workout, workoutExercises };
-};
-
-export default function WorkoutDetails() {
-  const { workout, workoutExercises } = useLoaderData<typeof clientLoader>();
-
-  return (
-    <div className="space-y-6 pt-20">
-      <hgroup className="header flex items-center justify-between gap-2">
-        <Link to="/" className="flex items-center gap-2">
-          <ChevronLeft size={20} />
-          <Paragraph>Home</Paragraph>
-        </Link>
-
-        <Paragraph className="capitalize" variant="label">
-          {format(workout.date, "eeee - MMM dd, yyy")}
-        </Paragraph>
-      </hgroup>
-
-      <div className="space-y-4">
-        {workoutExercises.map((exercise) => (
-          <WorkoutExercise key={exercise.id} workout={workout} exercise={exercise} />
-        ))}
-      </div>
-
-      <div className="flex justify-end">
-        <SelectExercise key={workoutExercises.length} workout={workout} />
-      </div>
-    </div>
-  );
-}
-
-function WorkoutExercise({
-  workout,
+export function WorkoutExercise({
   exercise,
 }: {
-  workout: WorkoutsResponse;
   exercise: WorkoutExercisesResponse<ExerciseSet[], { exercise_id: ExercisesResponse }>;
 }) {
   const [sets, setSets] = useState(exercise.sets ?? []);
-  const { toast } = useToast();
-  const revalidator = useRevalidator();
+  const fetcher = useFetcher<typeof action>();
 
   if (!exercise.expand?.exercise_id) return null;
   const exerciseInfo = exercise.expand.exercise_id;
-
-  const isOutOfSync = sets.length !== exercise.sets?.length;
 
   function handleAddSet() {
     setSets((sets) => {
@@ -124,15 +55,7 @@ function WorkoutExercise({
   }
 
   async function saveChanges(sets: ExerciseSet[]) {
-    try {
-      await api.collection("workout_exercises").update(exercise.id, { sets });
-    } catch (error) {
-      const description = error instanceof Error ? error.message : "Something went wrong";
-      toast({ title: "Error", description });
-    } finally {
-      await queryClient.invalidateQueries();
-      revalidator.revalidate();
-    }
+    fetcher.submit({ exercise_id: exercise.id, sets }, { method: "post" });
   }
 
   return (
@@ -141,7 +64,6 @@ function WorkoutExercise({
         <div className="flex items-center gap-2">
           <Dumbbell className="size-4" />
           <Heading variant="h4">{exerciseInfo.name}</Heading>
-          {isOutOfSync && <Loader className="size-4 animate-spin" />}
         </div>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" size="sm">

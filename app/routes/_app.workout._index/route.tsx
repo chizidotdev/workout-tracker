@@ -1,10 +1,11 @@
+import { useFetcher } from "@remix-run/react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, useRevalidator } from "@remix-run/react";
-import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
 import {
@@ -20,10 +21,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { Heading } from "~/components/ui/text";
 import { Textarea } from "~/components/ui/textarea";
-import { useToast } from "~/hooks/use-toast";
-import { api, queryClient } from "~/lib/api";
 import { cn } from "~/lib/utils";
 
+import { action } from "./server";
+
+export { action };
 
 const FormSchema = z.object({
   date: z.date({
@@ -33,37 +35,19 @@ const FormSchema = z.object({
 });
 
 export default function SomeParent() {
-  const revalidator = useRevalidator();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const { mutate, isPending } = useMutation({
-    mutationFn: (data: object) => api.collection("workouts").create(data),
-    onSuccess: async (result) => {
-      navigate(`/workout/${result.id}`);
-      await queryClient.invalidateQueries();
-      revalidator.revalidate();
-    },
-    onError: (error) =>
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Something went wrong",
-      }),
-  });
+  const { submit, state } = useFetcher<typeof action>();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: { date: new Date(), notes: "" },
   });
 
+  // toast({
+  //   title: "Error",
+  //   description: error instanceof Error ? error.message : "Something went wrong",
+  // }),
+
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    const user = api.authStore.model;
-
-    if (!user) return;
-
-    mutate({
-      user_id: user.id,
-      date: data.date,
-      notes: data.notes,
-    });
+    submit({ ...data, date: data.date.toISOString() }, { method: "post" });
   }
 
   function handleDateSelect(date: Date | undefined) {
@@ -221,7 +205,7 @@ export default function SomeParent() {
             )}
           />
 
-          <Button isLoading={isPending} type="submit">
+          <Button isLoading={state !== "idle"} type="submit">
             Create workout
           </Button>
         </form>

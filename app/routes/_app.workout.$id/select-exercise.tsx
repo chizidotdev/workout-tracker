@@ -1,8 +1,10 @@
+import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
-import { useRevalidator } from "@remix-run/react";
-import { useMutation } from "@tanstack/react-query";
 import { Check } from "lucide-react";
+import { useCachedLoaderData } from "remix-client-cache";
+
+import { Button } from "~/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -20,48 +22,25 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/components/ui/drawer";
-import { useToast } from "~/hooks/use-toast";
-import { useWorkouts } from "~/hooks/use-workouts";
-import { api, queryClient } from "~/lib/api";
 import { ExercisesResponse, WorkoutsResponse } from "~/lib/types";
 import { cn } from "~/lib/utils";
-import { workoutExercisesQueryKey } from "~/routes/_app.workout.$id";
 
-import { Button } from "./ui/button";
+import { action, loader } from "./server";
 
 export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
   const [selectedExercise, setSelectedExercise] = useState<ExercisesResponse | null>(null);
-  const { exercises } = useWorkouts();
-
-  const { toast } = useToast();
-  const revalidator = useRevalidator();
-  const { mutate, isPending } = useMutation({
-    mutationFn: (data: object) => api.collection("workout_exercises").create(data),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries();
-      revalidator.revalidate();
-    },
-    onError: (error) =>
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Something went wrong",
-      }),
-  });
+  const { exercises } = useCachedLoaderData<typeof loader>();
+  const fetcher = useFetcher<typeof action>();
 
   async function handleAddExercise() {
     if (!selectedExercise) {
       return;
     }
 
-    const user = api.authStore.model;
-    if (!user) return;
-
-    mutate({
-      user_id: user.id,
-      workout_id: workout.id,
-      exercise_id: selectedExercise.id,
-      sets: [{ reps: 10, weight: 10 }],
-    });
+    fetcher.submit(
+      { workout_id: workout.id, exercise_id: selectedExercise.id },
+      { method: "POST" }
+    );
   }
 
   return (
@@ -106,7 +85,7 @@ export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
         </Command>
 
         <DrawerFooter>
-          <Button isLoading={isPending} onClick={handleAddExercise}>
+          <Button isLoading={fetcher.state !== "idle"} onClick={handleAddExercise}>
             Submit
           </Button>
           <DrawerClose asChild>

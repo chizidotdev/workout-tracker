@@ -1,6 +1,7 @@
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 import { useState } from "react";
 
-import { Link } from "@remix-run/react";
 import {
   add,
   eachDayOfInterval,
@@ -18,14 +19,33 @@ import {
   startOfWeek,
 } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon, Dumbbell, History, MoveUpRight } from "lucide-react";
+import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
+
 import { Button } from "~/components/ui/button";
 import { Heading, Paragraph } from "~/components/ui/text";
-import { useWorkouts } from "~/hooks/use-workouts";
+import { loadAPI, requireAuth } from "~/lib/api";
 import { WorkoutsResponse } from "~/lib/types";
 import { cn } from "~/lib/utils";
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const api = await loadAPI(request);
+  const userData = await requireAuth(api);
+
+  const [workouts] = await Promise.all([
+    api.collection("workouts").getFullList({
+      sort: "-date",
+      filter: `user_id="${userData.id}"`,
+    }),
+  ]);
+
+  return { workouts };
+};
+
+export const clientLoader = cacheClientLoader;
+clientLoader.hydrate = true;
+
 export default function Logs() {
-  const { workouts } = useWorkouts();
+  const { workouts } = useCachedLoaderData<typeof loader>();
 
   const today = startOfToday();
   const [selectedDay, setSelectedDay] = useState(today);
@@ -148,7 +168,7 @@ function WorkoutEntry({ workout }: { workout: WorkoutsResponse }) {
         <History className="size-4 text-muted-foreground" />
         <Paragraph>Log</Paragraph> -{" "}
         <time dateTime={workout.date}>{format(startDateTime, "h:mm a")}</time>
-        <MoveUpRight className="ml-auto size-4" />
+        <MoveUpRight className="ml-auto size-4 text-muted-foreground" />
       </li>
     </Link>
   );

@@ -1,32 +1,38 @@
-import { Link, useNavigate } from "@remix-run/react";
-import { useMutation } from "@tanstack/react-query";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { Link, useFetcher } from "@remix-run/react";
+
 import { ChevronLeft } from "lucide-react";
+
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Heading } from "~/components/ui/text";
-import { useToast } from "~/hooks/use-toast";
-import { api } from "~/lib/api";
+import { authCookie, loadAPI, parseError } from "~/lib/api";
 
-const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const formData = new FormData(e.target as HTMLFormElement);
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
   const email = formData.get("email")!.toString();
   const password = formData.get("password")!.toString();
 
-  return await api.collection("users").authWithPassword(email, password);
+  try {
+    const api = await loadAPI(request);
+    await api.collection("users").authWithPassword(email, password);
+
+    return redirect("/", {
+      headers: {
+        "Set-Cookie": await authCookie.serialize(api.authStore.exportToCookie()),
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    return { error: parseError(e) };
+  }
 };
 
 export default function Login() {
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const { mutate: signIn, isPending } = useMutation({
-    mutationFn: loginUser,
-    onSuccess: () => navigate("/"),
-    onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    },
-  });
+  const fetcher = useFetcher();
+  const isPending = fetcher.state !== "idle";
+  // toast({ title: "Error", description: error.message, variant: "destructive" });
 
   return (
     <div className="container mt-40 px-8">
@@ -38,7 +44,7 @@ export default function Login() {
 
       <Heading className="text-center">Login</Heading>
 
-      <form onSubmit={signIn} className="mt-6 flex flex-col gap-3">
+      <fetcher.Form method="post" className="mt-8 flex flex-col gap-4">
         <div className="space-y-1">
           <Label>Email</Label>
           <Input required name="email" type="email" placeholder="user@example.com" />
@@ -52,7 +58,7 @@ export default function Login() {
         <Button isLoading={isPending} className="my-2" type="submit">
           Login
         </Button>
-      </form>
+      </fetcher.Form>
 
       <Link to="#" className="mt-4 flex w-full flex-col">
         <Button variant="ghost">Request account.</Button>

@@ -1,6 +1,8 @@
 import { NavLink } from "@remix-run/react";
+
 import { Dumbbell, History, House, User } from "lucide-react";
 import { motion } from "motion/react";
+
 import { cn } from "~/lib/utils";
 
 import styles from "./navbar.module.css";
@@ -13,7 +15,7 @@ const navLinks = [
   { title: "Profile", icon: motion(User), href: "/profile" },
 ];
 
-const MotionParagraph = motion(Paragraph);
+const MotionParagraph = motion.create(Paragraph);
 export function Navbar() {
   return (
     <>
