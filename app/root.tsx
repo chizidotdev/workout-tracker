@@ -12,9 +12,10 @@ import {
 
 import { Dumbbell } from "lucide-react";
 
-import { ThemeProvider } from "./components/theme-provider";
-import { Heading } from "./components/ui/text";
-import { Toaster } from "./components/ui/toaster";
+import { ThemeProvider } from "~/components/theme-provider";
+import { Toaster } from "~/components/ui/sonner";
+import { Heading } from "~/components/ui/text";
+
 import "./tailwind.css";
 
 export const meta: MetaFunction = () => {

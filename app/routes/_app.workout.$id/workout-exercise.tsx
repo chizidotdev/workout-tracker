@@ -1,7 +1,8 @@
 import { useFetcher } from "@remix-run/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ChevronsUpDown, Dumbbell, Plus, Trash2, Upload } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
@@ -19,6 +20,10 @@ export function WorkoutExercise({
 }) {
   const [sets, setSets] = useState(exercise.sets ?? []);
   const fetcher = useFetcher<typeof action>();
+
+  useEffect(() => {
+    fetcher.data?.error && toast.error(fetcher.data.error);
+  }, [fetcher.data]);
 
   if (!exercise.expand?.exercise_id) return null;
   const exerciseInfo = exercise.expand.exercise_id;
@@ -55,7 +60,7 @@ export function WorkoutExercise({
   }
 
   async function saveChanges(sets: ExerciseSet[]) {
-    fetcher.submit({ exercise_id: exercise.id, sets }, { method: "post" });
+    fetcher.submit({ exercise_id: exercise.id, sets: JSON.stringify(sets) }, { method: "put" });
   }
 
   return (
