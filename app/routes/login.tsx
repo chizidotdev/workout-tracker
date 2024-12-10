@@ -1,7 +1,9 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { Link, useFetcher } from "@remix-run/react";
+import { useEffect } from "react";
 
 import { ChevronLeft } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -30,9 +32,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Login() {
-  const fetcher = useFetcher();
+  const fetcher = useFetcher<typeof action>();
   const isPending = fetcher.state !== "idle";
-  // toast({ title: "Error", description: error.message, variant: "destructive" });
+
+  useEffect(() => {
+    fetcher.data?.error && toast.error(fetcher.data.error);
+  }, [fetcher.data]);
 
   return (
     <div className="container mt-40 px-8">
@@ -60,9 +65,9 @@ export default function Login() {
         </Button>
       </fetcher.Form>
 
-      <Link to="#" className="mt-4 flex w-full flex-col">
+      <a href="https://wa.link/eaxqm3" className="mt-4 flex w-full flex-col">
         <Button variant="ghost">Request account.</Button>
-      </Link>
+      </a>
     </div>
   );
 }

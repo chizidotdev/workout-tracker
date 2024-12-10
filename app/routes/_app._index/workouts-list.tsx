@@ -44,6 +44,13 @@ export function WorkoutsList() {
               {formatDistanceToNow(workout.date, { addSuffix: true })}
             </Paragraph>
 
+            {workout.status === "pending" && (
+              <div className="relative h-2 [&>*]:absolute [&>*]:inset-0">
+                <span className="size-2 animate-ping rounded-full bg-green-600"></span>
+                <span className="size-2 rounded-full bg-green-600"></span>
+              </div>
+            )}
+
             <MoveUpRight className="ml-auto size-4 text-muted-foreground" />
           </Link>
         </Fragment>

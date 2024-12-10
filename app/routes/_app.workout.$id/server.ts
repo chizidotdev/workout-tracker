@@ -30,7 +30,25 @@ export const action = async (args: ActionFunctionArgs) => {
       return await createExercise(args);
     case "PUT":
       return await updateExercises(args);
+    case "PATCH":
+      return await completeWorkout(args);
   }
+};
+
+const completeWorkout = async ({ request }: ActionFunctionArgs) => {
+  const api = await loadAPI(request);
+
+  const formData = await request.formData();
+  const workout_id = formData.get("workout_id")!.toString();
+
+  try {
+    await api.collection("workouts").update(workout_id, { status: "completed" });
+    return redirect("/logs");
+  } catch (error) {
+    return { error: parseError(error) };
+  }
+
+  return {};
 };
 
 const updateExercises = async ({ request }: ActionFunctionArgs) => {

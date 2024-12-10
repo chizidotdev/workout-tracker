@@ -1,6 +1,19 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs, redirect } from "@remix-run/node";
 
 import { loadAPI, requireAuth } from "~/lib/api";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const api = await loadAPI(request);
+
+  const activeWorkout = await api
+    .collection("workouts")
+    .getFirstListItem(`status="pending"`)
+    .catch((e) => console.log(e.message));
+
+  if (!activeWorkout) return {};
+
+  return redirect(`/workout/${activeWorkout.id}`);
+};
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const api = await loadAPI(request);
@@ -18,6 +31,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const workout = await api.collection("workouts").create({
       user_id: userData.id,
       date: new Date(date),
+      status: "pending",
       notes,
     });
 

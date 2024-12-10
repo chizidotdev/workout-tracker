@@ -23,9 +23,9 @@ import { Heading } from "~/components/ui/text";
 import { Textarea } from "~/components/ui/textarea";
 import { cn } from "~/lib/utils";
 
-import { action } from "./server";
+import { action, loader } from "./server";
 
-export { action };
+export { action, loader };
 
 const FormSchema = z.object({
   date: z.date({

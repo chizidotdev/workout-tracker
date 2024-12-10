@@ -1,9 +1,10 @@
-import { Link } from "@remix-run/react";
+import { Link, useFetcher } from "@remix-run/react";
 
 import { format } from "date-fns";
 import { ChevronLeft } from "lucide-react";
 import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
 
+import { Button } from "~/components/ui/button";
 import { Paragraph } from "~/components/ui/text";
 
 import { SelectExercise } from "./select-exercise";
@@ -36,9 +37,25 @@ export default function WorkoutDetails() {
         ))}
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-center gap-2">
+        <CompleteWorkout />
         <SelectExercise key={workoutExercises.length} workout={workout} />
       </div>
     </div>
+  );
+}
+
+function CompleteWorkout() {
+  const { workout } = useCachedLoaderData<typeof loader>();
+  const fetcher = useFetcher<typeof action>();
+
+  function onSubmit() {
+    fetcher.submit({ workout_id: workout.id }, { method: "PATCH" });
+  }
+
+  return (
+    <Button isLoading={fetcher.state !== "idle"} onClick={onSubmit} variant="secondary">
+      Complete Workout
+    </Button>
   );
 }

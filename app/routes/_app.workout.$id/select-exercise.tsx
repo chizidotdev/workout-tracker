@@ -46,7 +46,7 @@ export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button className="mx-auto">Add exercise</Button>
+        <Button>Add exercise</Button>
       </DrawerTrigger>
       <DrawerContent className="px-4">
         <DrawerHeader>
