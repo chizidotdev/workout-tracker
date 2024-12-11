@@ -1,4 +1,4 @@
-import { Link, useFetcher } from "@remix-run/react";
+import { useFetcher, useNavigate } from "@remix-run/react";
 
 import { ChevronLeft } from "lucide-react";
 import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
@@ -15,15 +15,16 @@ export const clientLoader = cacheClientLoader;
 clientLoader.hydrate = true;
 
 export default function WorkoutDetails() {
+  const navigate = useNavigate();
   const { workout, workoutExercises } = useCachedLoaderData<typeof loader>();
 
   return (
     <div className="space-y-6 pt-20">
       <hgroup className="header flex items-center justify-between gap-2">
-        <Link to="/" className="flex items-center gap-2">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2">
           <ChevronLeft size={20} />
-          <Paragraph>Home</Paragraph>
-        </Link>
+          <Paragraph>Back</Paragraph>
+        </button>
 
         <CompleteWorkout />
         {/* <Paragraph className="capitalize" variant="label">
@@ -38,7 +39,6 @@ export default function WorkoutDetails() {
       </div>
 
       <div className="flex justify-center gap-2">
-        <CompleteWorkout />
         <SelectExercise key={workoutExercises.length} workout={workout} />
       </div>
     </div>
