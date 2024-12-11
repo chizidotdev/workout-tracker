@@ -16,13 +16,16 @@ import { ThemeProvider } from "~/components/theme-provider";
 import { Toaster } from "~/components/ui/sonner";
 import { Heading } from "~/components/ui/text";
 
-import "./tailwind.css";
+import styles from "./tailwind.css?url";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Workout Tracker" }];
 };
 
-export const links: LinksFunction = () => [];
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: styles },
+  { rel: "manifest", href: "/assets/manifest.json" },
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -36,7 +39,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <link rel="shortcut icon" href="/assets/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
         <meta name="apple-mobile-web-app-title" content="Track" />
-        <link rel="manifest" href="/assets/site.webmanifest" />
 
         <Meta />
         <Links />
