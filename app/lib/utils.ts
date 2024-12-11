@@ -1,6 +1,8 @@
+import { type ClassValue, clsx } from "clsx";
 import dateTime from "date-and-time";
-import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+
+import { ExercisesMuscleGroupOptions, ExercisesResponse } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -46,3 +48,20 @@ export const timeAgo = (date: Date | string): string => {
 
   return `${seconds} seconds ago`;
 };
+
+export function getMuscleGroups(exercises: ExercisesResponse[]) {
+  return exercises.reduce(
+    (acc, curr) => {
+      const group = curr.muscle_group;
+      if (!group) return acc;
+
+      const restGroup = acc[group] ?? [];
+
+      return {
+        ...acc,
+        [group]: [...restGroup, curr],
+      };
+    },
+    {} as Record<ExercisesMuscleGroupOptions, ExercisesResponse[]>
+  );
+}

@@ -21,7 +21,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     api.collection("exercises").getFullList(),
   ]);
 
-  return { workout, workoutExercises, exercises };
+  return {
+    workout,
+    workoutExercises,
+    exercises: exercises.sort((a, b) => a.name.localeCompare(b.name)),
+  };
 };
 
 export const action = async (args: ActionFunctionArgs) => {
