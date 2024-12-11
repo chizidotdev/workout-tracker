@@ -9,10 +9,10 @@ import styles from "./navbar.module.css";
 import { Paragraph } from "./ui/text";
 
 const navLinks = [
-  { title: "Home", icon: motion(House), href: "/" },
-  { title: "Workout", icon: motion(Dumbbell), href: "/workout" },
-  { title: "Logs", icon: motion(History), href: "/logs" },
-  { title: "Profile", icon: motion(User), href: "/profile" },
+  { title: "Home", icon: motion.create(House), href: "/" },
+  { title: "Workout", icon: motion.create(Dumbbell), href: "/workout" },
+  { title: "Logs", icon: motion.create(History), href: "/logs" },
+  { title: "Profile", icon: motion.create(User), href: "/profile" },
 ];
 
 const MotionParagraph = motion.create(Paragraph);

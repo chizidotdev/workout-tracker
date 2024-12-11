@@ -1,9 +1,10 @@
 import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
+import { ListFilter, XIcon } from "lucide-react";
 import { useCachedLoaderData } from "remix-client-cache";
 
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -21,13 +22,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/components/ui/drawer";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "~/components/ui/select";
 import { Paragraph } from "~/components/ui/text";
 import { ExercisesMuscleGroupOptions, ExercisesResponse, WorkoutsResponse } from "~/lib/types";
 import { cn, getMuscleGroups } from "~/lib/utils";
@@ -69,7 +64,7 @@ export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
       <DrawerTrigger asChild>
         <Button>Add exercise</Button>
       </DrawerTrigger>
-      <DrawerContent className="max-h-[90dvh] px-4">
+      <DrawerContent className="max-h-[90dvh] min-h-[70vh] px-4">
         <DrawerHeader>
           <DrawerTitle>Add Exercise</DrawerTitle>
           {/* <DrawerDescription>This action cannot be undone.</DrawerDescription> */}
@@ -79,9 +74,23 @@ export function SelectExercise({ workout }: { workout: WorkoutsResponse }) {
           value={!selectedGroupExercises ? "all" : selectedGroupExercises[0].muscle_group}
           onValueChange={handleSelectGroup}
         >
-          <SelectTrigger className="my-2">
-            <SelectValue placeholder="Select Muscle Group" />
-          </SelectTrigger>
+          <div className="my-2 flex items-center gap-2">
+            <SelectTrigger asChild className="w-fit">
+              <Button variant="outline" size={!selectedGroupExercises ? "default" : "icon"}>
+                <ListFilter />
+                {!selectedGroupExercises && <Paragraph>All Muscle Groups</Paragraph>}
+              </Button>
+            </SelectTrigger>
+
+            {selectedGroupExercises && (
+              <div className={buttonVariants({ variant: "outline" })}>
+                <Paragraph>{selectedGroupExercises[0]?.muscle_group}</Paragraph>
+                <button onClick={() => handleSelectGroup("all")}>
+                  <XIcon size={14} />
+                </button>
+              </div>
+            )}
+          </div>
           <SelectContent>
             <SelectItem value="all">All Muscle Groups</SelectItem>
             {Object.keys(muscleGroups).map((group) => (

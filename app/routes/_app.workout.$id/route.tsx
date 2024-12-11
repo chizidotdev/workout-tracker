@@ -1,6 +1,5 @@
 import { Link, useFetcher } from "@remix-run/react";
 
-import { format } from "date-fns";
 import { ChevronLeft } from "lucide-react";
 import { cacheClientLoader, useCachedLoaderData } from "remix-client-cache";
 
@@ -26,9 +25,10 @@ export default function WorkoutDetails() {
           <Paragraph>Home</Paragraph>
         </Link>
 
-        <Paragraph className="capitalize" variant="label">
+        <CompleteWorkout />
+        {/* <Paragraph className="capitalize" variant="label">
           {format(workout.date, "eeee - MMM dd, yyy")}
-        </Paragraph>
+        </Paragraph> */}
       </hgroup>
 
       <div className="space-y-4">
@@ -55,7 +55,7 @@ function CompleteWorkout() {
 
   return (
     <Button isLoading={fetcher.state !== "idle"} onClick={onSubmit} variant="secondary">
-      Complete Workout
+      Finish
     </Button>
   );
 }
