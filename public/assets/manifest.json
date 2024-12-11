@@ -1,10 +1,10 @@
 {
-  "theme_color": "#f97415",
-  "background_color": "#fafafa",
+  "theme_color": "#0e0e11",
+  "background_color": "#0e0e11",
   "icons": [
     {
       "purpose": "monochrome maskable",
-      "sizes": "512x512",
+      "sizes": "24x24",
       "src": "/assets/icon512_monochrome.svg",
       "type": "image/svg"
     },
